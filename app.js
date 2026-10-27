@@ -1,89 +1,57 @@
 (() => {
   'use strict';
   const config = window.SITE_CONFIG || {};
-  if (config.brandName) document.querySelectorAll('[data-brand]').forEach(el => { el.textContent = config.brandName; });
-  document.getElementById('current-year').textContent = String(new Date().getFullYear());
+  document.querySelectorAll('[data-brand]').forEach(el => { el.textContent = config.brandName || 'مَدار'; });
+  document.getElementById('current-year').textContent = new Intl.NumberFormat('fa-IR',{useGrouping:false}).format(new Date().getFullYear());
   const menuButton = document.querySelector('.menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
-  function closeMenu() { mobileMenu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', 'باز کردن فهرست'); }
-  menuButton.addEventListener('click', () => { const expanded = menuButton.getAttribute('aria-expanded') === 'true'; mobileMenu.hidden = expanded; menuButton.setAttribute('aria-expanded', String(!expanded)); menuButton.setAttribute('aria-label', expanded ? 'باز کردن فهرست' : 'بستن فهرست'); });
-  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-  const desktopMedia = window.matchMedia('(min-width: 821px)');
-  desktopMedia.addEventListener('change', e => { if (e.matches) closeMenu(); });
-
-  const cards = [...document.querySelectorAll('.course-card')];
-  document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
-    const filter = button.dataset.filter;
-    document.querySelectorAll('[data-filter]').forEach(other => { const selected = other === button; other.classList.toggle('active', selected); other.setAttribute('aria-pressed', String(selected)); });
-    cards.forEach(card => { card.hidden = filter !== 'all' && card.dataset.audience !== filter; });
-    document.querySelector('.course-grid').classList.toggle('filtered', filter !== 'all');
-  }));
-
-  const courseData = {
-    starter: { title: 'از ایده تا اولین ایجنت', audience: 'مسیر آغاز · دانشجو و تازه‌کار', description: 'با یک مسئلهٔ مشخص شروع کنید و قدم به قدم یک دستیار مبتنی بر اسناد بسازید. آزمایش و گزارش خطا، بخشی از خود پروژه است.', prereq: 'آشنایی مقدماتی با کامپیوتر؛ مرور پایتون در ابتدای مسیر پیشنهاد شده است.', syllabus: ['صورت‌بندی مسئله، محدودیت‌ها و معیار موفقیت', 'مدل زبانی، پرامپت و خروجی ساختاریافته', 'اتصال ابزار و بازیابی از اسناد (RAG)', 'تک‌ایجنت، محدودیت حلقه و تأیید انسان', 'ارزیابی روی پرسش‌های ثابت، تحلیل خطا و مستندسازی'], outcome: 'دستیار پرسش‌وپاسخ روی اسناد نمونه، همراه با کد و گزارش ارزیابی.' },
-    builder: { title: 'مهندسی سیستم‌های ایجنتی', audience: 'مسیر مهندسی · برنامه‌نویس و پژوهشگر', description: 'معماری را با آزمایش انتخاب کنید. یک مسئلهٔ ثابت را با گردش‌کار، تک‌ایجنت و چندایجنت حل کنید و عملکرد را از چند زاویه بسنجید.', prereq: 'تسلط عملی به پایتون و API؛ تجربهٔ ساخت یک برنامه با مدل زبانی.', syllabus: ['قرارداد ابزارها، وضعیت، حافظه و مدیریت خطا', 'انتخاب میان گردش‌کار، تک‌ایجنت و معماری چندایجنتی', 'تفکیک زیرمسئله‌ها، هماهنگی و بودجهٔ اجرا', 'حلقهٔ بازخورد، خطاهای آبشاری و آزمایش پایداری', 'ارزیابی تکرارپذیر، مشاهدهٔ اجرا و کنترل هزینه', 'استقرار، دسترسی حداقلی و پایش پس از انتشار'], outcome: 'سه معماری روی یک مجموعه مسئله، با مقایسهٔ کیفیت، هزینه و زمان پاسخ.' },
-    manager: { title: 'هوش مصنوعی برای تصمیم‌گیران', audience: 'مسیر تصمیم · مدیر و صاحب کسب‌وکار', description: 'یاد بگیرید کدام مسئلهٔ سازمانی ارزش شروع دارد، چه چیزی را باید بسنجید و چگونه یک پایلوت محدود و قابل کنترل تعریف کنید.', prereq: 'بدون نیاز به برنامه‌نویسی؛ شناخت یک فرآیند واقعی در تیم یا سازمان.', syllabus: ['قابلیت‌ها و محدودیت‌های مدل‌ها و ایجنت‌ها', 'نقشهٔ فرصت‌ها: اثر، دسترسی به داده و پیچیدگی', 'برآورد ارزش، هزینه و ریسک عملیاتی', 'نوشتن بریف و تعریف معیار پذیرش پایلوت', 'کنترل دسترسی، محرمانگی و مسئول تأیید خروجی', 'تصمیم توسعه یا توقف بر اساس نتیجهٔ آزمایش'], outcome: 'نقشهٔ فرصت‌های سازمان و بریف اجرایی یک پایلوت با معیار پذیرش.' }
-  };
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function closeMenu() { mobileMenu.hidden = true; menuButton.setAttribute('aria-expanded','false'); menuButton.setAttribute('aria-label','باز کردن فهرست'); }
+  menuButton.addEventListener('click', () => { const expanded=menuButton.getAttribute('aria-expanded')==='true'; mobileMenu.hidden=expanded; menuButton.setAttribute('aria-expanded',String(!expanded)); menuButton.setAttribute('aria-label',expanded?'باز کردن فهرست':'بستن فهرست'); });
+  mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+  document.addEventListener('keydown', e=>{if(e.key==='Escape')closeMenu();});
+  window.matchMedia('(min-width:821px)').addEventListener('change',e=>{if(e.matches)closeMenu();});
+  document.querySelectorAll('[data-interest]').forEach(link=>link.addEventListener('click',()=>window.MadarContact?.selectInterest(link.dataset.interest,link.dataset.request)));
   const dialog = document.getElementById('course-dialog');
-  let activeCourse = null;
-  let dialogOpener = null;
-  let dialogFocusTarget = null;
-  function openCourse(key, opener) {
-    const course = courseData[key]; if (!course) return;
-    activeCourse = course; dialogOpener = opener; dialogFocusTarget = null;
-    document.getElementById('dialog-title').textContent = course.title;
-    document.getElementById('dialog-audience').textContent = course.audience;
-    document.getElementById('dialog-description').textContent = course.description;
-    document.getElementById('dialog-prereq').textContent = course.prereq;
-    document.getElementById('dialog-outcome').textContent = course.outcome;
-    const syllabus = document.getElementById('dialog-syllabus'); syllabus.replaceChildren();
-    course.syllabus.forEach(text => { const li = document.createElement('li'); li.textContent = text; syllabus.append(li); });
-    dialog.showModal(); document.body.style.overflow = 'hidden'; dialog.scrollTop = 0;
-  }
-  document.querySelectorAll('[data-course]').forEach(button => button.addEventListener('click', () => openCourse(button.dataset.course, button)));
-  document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', e => { if (e.target === dialog) { const r = dialog.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dialog.close(); } });
-  dialog.addEventListener('close', () => { document.body.style.overflow = ''; const target = dialogFocusTarget || dialogOpener; if (target) target.focus({ preventScroll: true }); });
-  function selectInterest(value) { const input = document.querySelector(`input[name="interest"][value="${value}"]`); if (input) input.checked = true; invalidateBrief(); }
-  document.getElementById('course-interest').addEventListener('click', () => {
-    selectInterest('education');
-    const goal = document.querySelector('textarea[name="goal"]');
-    if (!goal.value.trim()) goal.value = `به مسیر «${activeCourse.title}» علاقه‌مندم. هدف من: `;
-    dialogFocusTarget = document.querySelector('input[name="name"]');
-    dialog.close(); document.getElementById('contact').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    dialogFocusTarget.focus({ preventScroll: true });
+  let opener = null;
+  let focusAfterClose = null;
+  document.querySelectorAll('[data-course]').forEach(button=>button.addEventListener('click',()=>{opener=button;focusAfterClose=null;dialog.showModal();document.body.style.overflow='hidden';dialog.scrollTop=0;}));
+  document.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+  dialog.addEventListener('close',()=>{document.body.style.overflow='';(focusAfterClose||opener)?.focus({preventScroll:true});});
+  document.getElementById('course-interest').addEventListener('click',()=>{
+    window.MadarContact?.selectInterest('education','برای دورهٔ «مهندسی عامل‌های هوشمند» در ۴ و ۵ آذر علاقه‌مندم. لطفاً شرایط حضور و ثبت‌نام را بفرستید.');
+    focusAfterClose=document.querySelector('input[name="name"]');dialog.close();document.getElementById('contact').scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth'});focusAfterClose.focus({preventScroll:true});
   });
-  document.querySelectorAll('[data-interest]').forEach(link => link.addEventListener('click', () => selectInterest(link.dataset.interest)));
-
-  const caseData = {
-    knowledge: { input: '«شرایط مرخصی در آیین‌نامهٔ داخلی چیست؟»', step1: 'بازیابی از اسناد', sub1: 'منابع مجاز سازمان', step2: 'ساخت پاسخ', sub2: 'همراه با ارجاع', step3: 'کنترل کیفیت', sub3: 'بررسی شواهد پاسخ', result: 'درستی پاسخ، دقت ارجاع و نرخ «نمی‌دانم» در نبود شواهد.' },
-    research: { input: '«منابع مرتبط با موضوع پژوهش من را مقایسه کن.»', step1: 'گردآوری منابع', sub1: 'مجموعه منابع مجاز', step2: 'تحلیل و مقایسه', sub2: 'ردیابی هر ادعا', step3: 'بررسی پژوهشگر', sub3: 'تأیید نتیجهٔ نهایی', result: 'پوشش منابع، صحت استنادها و زمان مورد نیاز برای بازبینی پژوهشگر.' },
-    operations: { input: '«این درخواست پشتیبانی را دسته‌بندی و آمادهٔ ارجاع کن.»', step1: 'خواندن درخواست', sub1: 'دادهٔ ورودی محدود', step2: 'پیشنهاد اقدام', sub2: 'طبق قواعد تیم', step3: 'تأیید مسئول', sub3: 'پیش از هر تغییر', result: 'دقت دسته‌بندی، نرخ اصلاح انسان و زمان صرفه‌جویی‌شده در هر درخواست.' }
+  const products = {
+    wealth: {
+      title:'دارایی‌ها را کنار هدف‌ها ببینید.',
+      description:'تصویری یکپارچه از دارایی‌ها، درآمد، تعهدات و هدف‌های مالی؛ برای خانواده‌ها، افراد و کسب‌وکارهایی که می‌خواهند اثر تغییر شرایط را بر تصمیم‌هایشان بررسی کنند.',
+      features:['داشبورد دارایی و جریان نقدی','مقایسهٔ سناریوها با توجه به اهداف','بررسی رویدادهای اقتصادی و سیاسی','بازبینی پیشنهادها با اطلاعات تازه'],
+      method:'ارتباط درآمد، نقدینگی و ریسک را با سناریوهای طلا، مسکن و تغییر شرایط اقتصادی و سیاسی در کنار هم بررسی می‌کنیم.',
+      brand:'مَدار دارایی',kicker:'نمای دارایی',previewTitle:'یک تصویر، چند ارتباط.',ringTitle:'دارایی‌ها',ringSub:'نمای یکپارچه',
+      legend:[['نقدشونده','۳۰٪'],['بلندمدت','۵۰٪'],['سایر','۲۰٪']],chartLabel:'مثال ساختگی ترکیب دارایی: ۳۰ درصد نقدشونده، ۵۰ درصد بلندمدت و ۲۰ درصد سایر',
+      insightLabel:'پرسش بعدی',insight:'اگر هزینه‌های زندگی تغییر کند، نقدینگی من برای هدف‌های پیش رو چه تغییری می‌کند؟',input:'داده و هدف',note:'نمونه‌ای از رابط پیشنهادی؛ دادهٔ واقعی دریافت نمی‌کند و توصیهٔ خرید یا فروش ارائه نمی‌دهد.'
+    },
+    growth: {
+      title:'محتوا را با بازخورد زنده نگه دارید.',
+      description:'دستیاری برای مدیریت محتوا و سئو؛ از شناخت وضعیت سایت یا صفحه تا پیشنهاد اقدام، برنامهٔ انتشار و پیگیری نتیجهٔ تغییرات.',
+      features:['تحلیل محتوا و داده‌های عملکرد','شناسایی موضوع‌ها و اولویت‌های تازه','پیشنهاد برنامهٔ تولید و انتشار','بازبینی پیشنهادها بر اساس بازخورد مخاطب'],
+      method:'رشد، حاصل یک اقدام جداگانه نیست. ارتباط محتوا، جست‌وجو، مخاطب و زمان را دنبال می‌کنیم تا اقدام بعدی با دادهٔ تازه بازبینی شود.',
+      brand:'مَدار رشد',kicker:'چرخهٔ محتوا',previewTitle:'هر انتشار، یک بازخورد.',ringTitle:'محتوا',ringSub:'تحلیل تا بازبینی',legend:[['ایده در صف','۵'],['نیازمند بازبینی','۳'],['گزارش بازخورد','۱']],
+      chartLabel:'نمای مفهومی چرخه محتوا؛ فهرست نمونه شامل پنج ایده، سه مورد بازبینی و یک گزارش است. حلقه نمودار آماری نیست.',
+      insightLabel:'اقدام بعدی',insight:'کدام موضوع‌ها ارزش بازنویسی دارند و برنامهٔ انتشار با بازخورد تازه چگونه تغییر کند؟',input:'محتوا و مخاطب',note:'نمونه‌ای از رابط پیشنهادی؛ به حساب یا سایت شما وصل نیست و عملکرد یا رتبه‌ای را تضمین نمی‌کند.'
+    }
   };
-  document.querySelectorAll('[data-case]').forEach(button => button.addEventListener('click', () => {
-    const data = caseData[button.dataset.case];
-    document.querySelectorAll('[data-case]').forEach(other => { const selected = other === button; other.classList.toggle('selected', selected); other.setAttribute('aria-pressed', String(selected)); });
-    ['input', 'step1', 'sub1', 'step2', 'sub2', 'step3', 'sub3', 'result'].forEach(key => { document.getElementById(`demo-${key}`).textContent = data[key]; });
+  document.querySelectorAll('[data-product]').forEach(button=>button.addEventListener('click',()=>{
+    const key=button.dataset.product;const data=products[key];if(!data)return;
+    document.querySelectorAll('[data-product]').forEach(other=>{const selected=other===button;other.classList.toggle('selected',selected);other.setAttribute('aria-pressed',String(selected));});
+    const map={'product-title':data.title,'product-description':data.description,'product-method':data.method,'preview-brand':data.brand,'preview-kicker':data.kicker,'preview-title':data.previewTitle,'preview-insight-label':data.insightLabel,'preview-insight':data.insight,'loop-input':data.input,'preview-note':data.note};
+    Object.entries(map).forEach(([id,value])=>{document.getElementById(id).textContent=value;});
+    const features=document.getElementById('product-features');features.replaceChildren();data.features.forEach(text=>{const li=document.createElement('li');li.textContent=text;features.append(li);});
+    const legend=document.getElementById('viz-legend');legend.replaceChildren();data.legend.forEach(([name,value])=>{const row=document.createElement('span');const dot=document.createElement('i');const val=document.createElement('b');val.textContent=value;row.append(dot,document.createTextNode(name+' '),val);legend.append(row);});
+    const ring=document.getElementById('allocation-ring');ring.classList.toggle('growth-ring',key==='growth');ring.setAttribute('aria-label',data.chartLabel);
+    const ringLabel=document.getElementById('ring-label');ringLabel.replaceChildren(document.createTextNode(data.ringTitle));const small=document.createElement('small');small.textContent=data.ringSub;ringLabel.append(small);
+    document.getElementById('product-request').dataset.request=`برای آشنایی با «${data.brand}» و شرایط استفاده از آن راهنمایی می‌خواهم.`;
   }));
-
-  const form = document.getElementById('brief-form');
-  const status = document.getElementById('form-status');
-  const emailLink = document.getElementById('email-brief');
-  const publicEmail = typeof config.publicEmail === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.publicEmail) ? config.publicEmail : '';
-  if (publicEmail) document.getElementById('contact-explanation').textContent = 'ابتدا فایل درخواست را دانلود کنید. سپس می‌توانید آن را در برنامهٔ ایمیل خود باز و برای تیم ارسال کنید. ارسال خودکار انجام نمی‌شود.';
-  function invalidateBrief() { status.textContent = ''; emailLink.hidden = true; emailLink.removeAttribute('href'); }
-  form.addEventListener('input', invalidateBrief);
-  form.addEventListener('submit', e => {
-    e.preventDefault(); if (!form.reportValidity()) return;
-    const data = new FormData(form);
-    const name = String(data.get('name')).trim(); const contact = String(data.get('contact')).trim(); const goal = String(data.get('goal')).trim();
-    if (!name || !contact || !goal) { status.textContent = 'لطفاً نام، راه تماس و هدف را کامل کنید.'; return; }
-    const interest = data.get('interest') === 'service' ? 'ساخت ایجنت برای تیم' : 'آموزش و یادگیری';
-    const body = `درخواست آشنایی با ${config.brandName || 'مَدار'}\n\nنام: ${name}\nراه تماس: ${contact}\nمسیر: ${interest}\n\nهدف:\n${goal}\n\nساخته‌شده در نسخهٔ نمایشی وب‌سایت. این فایل به‌صورت خودکار برای تیم ارسال نشده است.\n`;
-    const url = URL.createObjectURL(new Blob(['\uFEFF', body], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = 'madar-introduction-request.txt'; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
-    status.textContent = 'فایل درخواست آماده شد و دانلود آن آغاز شد. این درخواست هنوز برای تیم ارسال نشده است.';
-    if (publicEmail) { emailLink.href = `mailto:${encodeURIComponent(publicEmail)}?subject=${encodeURIComponent(`درخواست ${interest}`)}&body=${encodeURIComponent(body)}`; emailLink.hidden = false; }
-  });
 })();

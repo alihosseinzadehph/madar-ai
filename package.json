@@ -1,0 +1,9 @@
+{
+  "name": "madar-ai-site",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node tools/preview.mjs",
+    "check": "node --check app.js && node --check config.js && node --check contact.js && node --check tools/preview.mjs"
+  }
+}
