@@ -20,7 +20,7 @@
   dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
   dialog.addEventListener('close',()=>{document.body.style.overflow='';(focusAfterClose||opener)?.focus({preventScroll:true});});
   document.getElementById('course-interest').addEventListener('click',()=>{
-    window.MadarContact?.selectInterest('education','برای دورهٔ «مهندسی عامل‌های هوشمند» در ۴ و ۵ آذر علاقه‌مندم. لطفاً شرایط حضور و ثبت‌نام را بفرستید.');
+    window.MadarContact?.selectInterest('education','برای دورهٔ «مهندسی عامل‌های هوشمند» در ۱۱ و ۱۲ آذر علاقه‌مندم. لطفاً شرایط حضور و ثبت‌نام را بفرستید.');
     focusAfterClose=document.querySelector('input[name="name"]');dialog.close();document.getElementById('contact').scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth'});focusAfterClose.focus({preventScroll:true});
   });
   const products = {
