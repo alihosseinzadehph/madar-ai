@@ -5,7 +5,6 @@
   document.getElementById('current-year').textContent = new Intl.NumberFormat('fa-IR',{useGrouping:false}).format(new Date().getFullYear());
   const menuButton = document.querySelector('.menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   function closeMenu() { mobileMenu.hidden = true; menuButton.setAttribute('aria-expanded','false'); menuButton.setAttribute('aria-label','باز کردن فهرست'); }
   menuButton.addEventListener('click', () => { const expanded=menuButton.getAttribute('aria-expanded')==='true'; mobileMenu.hidden=expanded; menuButton.setAttribute('aria-expanded',String(!expanded)); menuButton.setAttribute('aria-label',expanded?'باز کردن فهرست':'بستن فهرست'); });
   mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
@@ -14,15 +13,10 @@
   document.querySelectorAll('[data-interest]').forEach(link=>link.addEventListener('click',()=>window.MadarContact?.selectInterest(link.dataset.interest,link.dataset.request)));
   const dialog = document.getElementById('course-dialog');
   let opener = null;
-  let focusAfterClose = null;
-  document.querySelectorAll('[data-course]').forEach(button=>button.addEventListener('click',()=>{opener=button;focusAfterClose=null;dialog.showModal();document.body.style.overflow='hidden';dialog.scrollTop=0;}));
+  document.querySelectorAll('[data-course]').forEach(button=>button.addEventListener('click',()=>{opener=button;dialog.showModal();document.body.style.overflow='hidden';dialog.scrollTop=0;}));
   document.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
-  dialog.addEventListener('close',()=>{document.body.style.overflow='';(focusAfterClose||opener)?.focus({preventScroll:true});});
-  document.getElementById('course-interest').addEventListener('click',()=>{
-    window.MadarContact?.selectInterest('education','برای دورهٔ «مهندسی عامل‌های هوشمند» در ۱۱ و ۱۲ آذر علاقه‌مندم. لطفاً شرایط حضور و ثبت‌نام را بفرستید.');
-    focusAfterClose=document.querySelector('input[name="name"]');dialog.close();document.getElementById('contact').scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth'});focusAfterClose.focus({preventScroll:true});
-  });
+  dialog.addEventListener('close',()=>{document.body.style.overflow='';opener?.focus({preventScroll:true});});
   const products = {
     wealth: {
       title:'دارایی‌ها را کنار هدف‌ها ببینید.',
